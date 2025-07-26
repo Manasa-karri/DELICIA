@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { RecipeCard } from '../components/Recipe/RecipeCard';
 import { RecipeModal } from "../components/Recipe/RecipeModal";
 
@@ -9,6 +9,9 @@ const GlobalSearch = () => {
   const [searchType, setSearchType] = useState('google-global');
   const [error, setError] = useState('');
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [recipeLoading, setRecipeLoading] = useState(false);
+
+  const recipeCache = useRef(new Map());
 
   const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
   const cxGlobal = import.meta.env.VITE_GOOGLE_CSE_GLOBAL;
@@ -47,12 +50,20 @@ const GlobalSearch = () => {
   };
 
   const fetchScrapedRecipe = async (url) => {
+    // Show modal first with loading
+    setRecipeLoading(true);
+    setSelectedRecipe({ title: 'Loading...', imageUrl: '', ingredients: [], instructions: [], nutrition: {} });
+
+    if (recipeCache.current.has(url)) {
+      setSelectedRecipe(recipeCache.current.get(url));
+      setRecipeLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('http://localhost:5001/api/scrape', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
       });
 
@@ -60,13 +71,17 @@ const GlobalSearch = () => {
 
       if (data.error) {
         setError(`Scraping Error: ${data.error}`);
-        return;
+        setSelectedRecipe(null);
+      } else {
+        recipeCache.current.set(url, data);
+        setSelectedRecipe(data);
       }
-
-      setSelectedRecipe(data); // ✅ Show scraped recipe details
     } catch (error) {
       console.error("Scraping failed:", error);
       setError("Failed to fetch recipe details.");
+      setSelectedRecipe(null);
+    } finally {
+      setRecipeLoading(false);
     }
   };
 
@@ -117,59 +132,12 @@ const GlobalSearch = () => {
         ))}
       </div>
 
-      {/* ✅ Full Modal for Selected Scraped Recipe */}
       {selectedRecipe && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-11/12 md:w-2/3 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-4">{selectedRecipe.title}</h2>
-
-            {selectedRecipe.image && (
-              <img
-                src={selectedRecipe.image}
-                alt={selectedRecipe.title}
-                className="mb-4 w-full max-h-[300px] object-cover rounded"
-              />
-            )}
-
-            <div className="mb-2 text-gray-700">
-              <strong>Total Time:</strong> {selectedRecipe.total_time || 'N/A'} mins
-              <br />
-              <strong>Servings:</strong> {selectedRecipe.yields || 'N/A'}
-              <br />
-              <strong>Source:</strong> {selectedRecipe.host || 'Unknown'}
-            </div>
-
-            <h4 className="font-semibold mt-4">Ingredients:</h4>
-            <ul className="list-disc ml-6 mb-4">
-              {selectedRecipe.ingredients?.map((ing, i) => (
-                <li key={i}>{ing}</li>
-              ))}
-            </ul>
-
-            <h4 className="font-semibold mt-2">Instructions:</h4>
-            <p className="mb-4 whitespace-pre-wrap">{selectedRecipe.instructions}</p>
-
-            {selectedRecipe.nutrients && typeof selectedRecipe.nutrients === 'object' && (
-              <>
-                <h4 className="font-semibold mt-2">Nutrients:</h4>
-                <ul className="list-disc ml-6 mb-2">
-                  {Object.entries(selectedRecipe.nutrients).map(([key, value]) => (
-                    <li key={key}>
-                      <strong>{key}</strong>: {value}
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-
-            <button
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-              onClick={() => setSelectedRecipe(null)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <RecipeModal
+          recipe={selectedRecipe}
+          loading={recipeLoading}
+          onClose={() => setSelectedRecipe(null)}
+        />
       )}
     </div>
   );

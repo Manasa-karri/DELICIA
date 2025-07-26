@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, Users, ChefHat, X } from 'lucide-react';
+import { Clock, Users, ChefHat } from 'lucide-react';
 import { Modal } from '../UI/Modal';
 
 export const RecipeModal = ({ recipe, isOpen, onClose }) => {
@@ -23,7 +23,11 @@ export const RecipeModal = ({ recipe, isOpen, onClose }) => {
       <div className="bg-white">
         {/* Header Image */}
         <div className="relative h-64 sm:h-80">
-          <img src={recipe.imageUrl} alt={recipe.title} className="w-full h-full object-cover" />
+          <img
+            src={recipe.imageUrl}
+            alt={recipe.title}
+            className="w-full h-full object-cover"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-6 left-6 right-6 text-white">
             <div className="flex items-center space-x-3 mb-3">
@@ -52,7 +56,7 @@ export const RecipeModal = ({ recipe, isOpen, onClose }) => {
             </div>
             <div className="flex items-center space-x-2 text-gray-600">
               <ChefHat className="h-5 w-5" />
-              <span className="font-medium">{recipe.authorName}</span>
+              <span className="font-medium">{recipe.authorName || 'Unknown'}</span>
             </div>
           </div>
 
@@ -60,7 +64,7 @@ export const RecipeModal = ({ recipe, isOpen, onClose }) => {
             <div>
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Ingredients</h3>
               <ul className="space-y-3">
-                {recipe.ingredients.map((ingredient, index) => (
+                {Array.isArray(recipe.ingredients) && recipe.ingredients.map((ingredient, index) => (
                   <li key={index} className="flex items-start">
                     <span className="w-2 h-2 bg-orange-500 rounded-full mt-3 mr-4 flex-shrink-0" />
                     <span className="text-gray-700 leading-relaxed">{ingredient}</span>
@@ -72,7 +76,7 @@ export const RecipeModal = ({ recipe, isOpen, onClose }) => {
             <div>
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Instructions</h3>
               <ol className="space-y-4">
-                {recipe.instructions.map((instruction, index) => (
+                {Array.isArray(recipe.instructions) && recipe.instructions.map((instruction, index) => (
                   <li key={index} className="flex items-start">
                     <span className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-sm font-bold rounded-full w-8 h-8 flex items-center justify-center mr-4 mt-1 flex-shrink-0">
                       {index + 1}

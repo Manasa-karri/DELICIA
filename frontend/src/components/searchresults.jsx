@@ -1,7 +1,7 @@
 import React from 'react';
 import { RecipeCard } from './Recipe/RecipeCard';
 
-export const SearchResults = ({ results, onRecipeClick }) => {
+export const SearchResults = ({ results, onRecipeClick, onRecipeHover }) => {
   if (!results || results.length === 0) {
     return <div className="text-center mt-10 text-gray-500">No recipes found.</div>;
   }
@@ -13,6 +13,7 @@ export const SearchResults = ({ results, onRecipeClick }) => {
           key={index}
           recipe={recipe}
           onClick={() => onRecipeClick(recipe)}
+          onMouseEnter={() => onRecipeHover(recipe)}
         />
       ))}
     </div>
