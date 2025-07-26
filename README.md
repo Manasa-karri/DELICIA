@@ -115,13 +115,6 @@ python app.py
 
 ---
 
-## 🙋‍♀️ Author
-
-**Sai Manasa**  
-Electrical and Electronics Engineering Undergraduate passionate about full-stack development and AI integrations.
-
----
-
 ## 📃 License
 
 This project is licensed under the MIT License.
