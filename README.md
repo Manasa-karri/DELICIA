@@ -12,7 +12,6 @@
 - 🔍 Global recipe search (via API integration)
 - 🧠 Smart recipe scraping from public URLs
 - ❤️ Save favorite recipes to your profile
-- 🎨 Dark mode toggle for a better UX
 - 📂 Category filters & sorting by difficulty/cook time
 - 📱 Fully responsive UI
 
