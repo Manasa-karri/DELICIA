@@ -12,7 +12,7 @@ import GlobalSearch from './components/GlobalSearch';
 import ScrollToTop from './components/ScrollToTop';
 
 
-// 👇️ Import pages if not already created
+// Import pages if not already created
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import LearnMorePage from './pages/LearnMorePage';
